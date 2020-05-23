@@ -92,7 +92,6 @@ const AddNotes = (props) => {
 
     view = <View>
         {!editMode ? searchBarAndSuggestions : null}
-
         {mapView ?
             <View>
                 <MapView
@@ -176,4 +175,15 @@ const AddNotes = (props) => {
         </ScrollView >
     );
 }
+
+AddNotes.navigationOptions = ({ navigation }) => ({
+    title: "Add Notes",
+    headerStyle: {
+        backgroundColor: colors.primary,
+    },
+    headerTintColor: colors.white,
+
+});
+
+
 export default AddNotes
