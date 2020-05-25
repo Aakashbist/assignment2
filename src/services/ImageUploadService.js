@@ -31,8 +31,8 @@ function getUriBasedOnOS(uri) {
 export function openDocumentPicker() {
     return new Promise((resolve, reject) => {
         try {
-            const res = DocumentPicker.pickMultiple({
-                type: [DocumentPicker.types.allFiles],
+            const res = DocumentPicker.pick({
+                type: [DocumentPicker.types.images],
                 // DocumentPicker.types.allFiles,image,plainText,audio,pdf
             });
             //uri,type,name(filename),size is in res obj

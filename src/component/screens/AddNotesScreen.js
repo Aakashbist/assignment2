@@ -5,6 +5,8 @@ import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { getGooglePlaceAutocomplete, getGooglePlaceDetails } from '../../services/mapService';
 import styles from '../../resources/styles';
 import colors from '../../resources/colors';
+import { openDocumentPicker } from '../../services/ImageUploadService';
+
 
 
 const AddNotes = (props) => {
@@ -12,14 +14,14 @@ const AddNotes = (props) => {
     const [longitude, setLongitude] = useState(0);
     const [destination, setDestination] = useState('');
     const [address, setAddress] = useState([]);
-    const [imageFileName, setImageFileName] = useState();
-    const [imageUri, setImageUri] = useState();
     const [description, setDescription] = useState();
     const [error, setError] = useState();
     const [editMode, setEditMode] = useState(false);
     const [mapView, setMapView] = useState(false);
     const [predictions, setPrediction] = useState([]);
     const [canAddNotes, setCanAddNotes] = useState('');
+    const [imageFileName, setImageFileName] = useState();
+    const [imageUri, setImageUri] = useState();
 
 
     useEffect(() => {
@@ -66,6 +68,14 @@ const AddNotes = (props) => {
             })
             .catch(error => setError(error));
     };
+
+    chooseDocument = () => {
+        openDocumentPicker.then((res) => {
+            setImageFileName(res.name);
+            setImageUri(res.uri);
+
+        })
+    }
 
     const suggestionView = predictions.map(item =>
         <TouchableOpacity
@@ -142,7 +152,7 @@ const AddNotes = (props) => {
                         </Fragment> :
                         <Fragment>
                             <TouchableOpacity
-                                //  onPress={this.selectImage}
+                                onPress={this.chooseDocument}
                                 style={{ justifyContent: 'flex-start', flexDirection: 'row', alignContent: 'center', margin: 10 }} >
                                 <Text style={{ color: colors.primary, fontSize: 18 }}>Add a photo</Text>
                             </TouchableOpacity>

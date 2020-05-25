@@ -77,8 +77,10 @@ target 'Notes' do
   pod 'glog', :podspec => '../node_modules/react-native/third-party-podspecs/glog.podspec'
   pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec'
 
-
   pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
+
+ # document upload
+ pod 'react-native-document-picker', :path => '../node_modules/react-native-document-picker'
 
   target 'NotesTests' do
     inherit! :complete
