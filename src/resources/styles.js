@@ -18,10 +18,7 @@ export default {
         flex: 1,
         flexDirection: 'row'
     },
-    chatContainer: {
-        flex: 1,
-        width: '100%',
-    },
+
     flatView: {
         justifyContent: 'center',
         paddingTop: 30,
@@ -85,17 +82,7 @@ export default {
         borderRadius: 4,
         minWidth: '50%'
     },
-    unitButton: {
-        padding: 5,
-        margin: 10,
-        paddingVertical: 8,
-        alignItems: 'center',
-        backgroundColor: colors.primary,
-        borderColor: colors.primary,
-        borderWidth: 1,
-        borderRadius: 4,
-        minWidth: '30%'
-    },
+
     buttonText: {
         fontSize: 18,
         color: colors.white
@@ -128,56 +115,14 @@ export default {
     map: {
         height: 150
     },
-    TouchableOpacityStyle: {
-        position: 'absolute',
-        width: 50,
-        height: 50,
-        alignItems: 'center',
-        justifyContent: 'center',
-        right: 30,
-        bottom: 30,
-    },
+
     customActionsContainer: {
         flex: 1,
         flexDirection: "row",
         justifyContent: "flex-start",
         alignItems: "center",
     },
-    dashboardViewWithShadow: {
-        margin: 16,
-        alignSelf: 'stretch',
-        borderRadius: 8,
-        backgroundColor: colors.white,
-        borderRadius: 2,
-        borderColor: '#ddd',
-        //ios    
-        shadowOpacity: 0.3,
-        shadowRadius: 3,
-        shadowOffset: {
-            height: 0,
-            width: 0
-        },
-        //android
-        elevation: 4
-    },
-    timelineContainer: {
-        flex: 1,
-        padding: 20,
-        paddingTop: 65,
-        backgroundColor: colors.white,
-        width: '100%',
 
-    },
-    timelineList: {
-        flex: 1,
-        marginTop: 20,
-    },
-    FloatingButtonStyle: {
-        resizeMode: 'contain',
-        width: 50,
-        height: 50,
-        //backgroundColor:'black'
-    },
     // To show pink text like "Sign up" under login button
     overline: {
         fontSize: 14,
@@ -196,9 +141,5 @@ export default {
     primaryTextHeading: {
         color: colors.primary,
         fontSize: 24
-    },
-    drawerIcon: {
-        width: 20,
-        height: 20
     }
 }

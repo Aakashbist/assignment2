@@ -1,11 +1,15 @@
-import React, { Fragment, useState, useEffect } from 'react';
-import { ActivityIndicator, Alert, DatePickerAndroid, FlatList, Image, SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import React, { Fragment, useEffect, useState } from 'react';
+import { Alert, Image, SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { Icon, SearchBar } from 'react-native-elements';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
-import { getGooglePlaceAutocomplete, getGooglePlaceDetails } from '../../services/mapService';
-import styles from '../../resources/styles';
 import colors from '../../resources/colors';
-import { openDocumentPicker } from '../../services/ImageUploadService';
+import styles from '../../resources/styles';
+import { Notes } from '../../models/Notes';
+import { getDownloadUrl, openDocumentPicker } from '../../services/ImageUploadService';
+import { getGooglePlaceAutocomplete, getGooglePlaceDetails } from '../../services/mapService';
+import parseFirebaseError from '../errorParser/firebaseErrorParser';
+import parseMapApiError from '../errorParser/mapApiErrorParser';
+import { createNotes } from '../../services/NoteService';
 
 
 
@@ -22,18 +26,15 @@ const AddNotes = (props) => {
     const [canAddNotes, setCanAddNotes] = useState('');
     const [imageFileName, setImageFileName] = useState();
     const [imageUri, setImageUri] = useState();
-
+    const [uploadProgress, setUploadProgress] = useState(0);
+    const [isUploading, setIsUploading] = useState(false);
 
     useEffect(() => {
-        let _canAddNotes = description !== null && imageUri !== null;
-        if (canAddNotes !== _canAddNotes) {
-            setCanAddNotes(_canAddNotes);
-        }
-    }, [imageUri, description]);
+
+    }, []);
 
     onPredictionSelected = place => {
         setDestination(place.description);
-        //setPlaceID(place.place_id);
         setAddress(place.description);
         setPrediction([]);
         loadCoordinatesByPlaceId(place.place_id);
@@ -70,11 +71,34 @@ const AddNotes = (props) => {
     };
 
     chooseDocument = () => {
-        openDocumentPicker.then((res) => {
-            setImageFileName(res.name);
-            setImageUri(res.uri);
+        openDocumentPicker().then((response) => {
+            alert(JSON.stringify(response))
+            setImageFileName(response.name);
+            setImageUri(response.uri)
 
         })
+            .catch(error => (alert(error)))
+    }
+
+    handleAddNotes = () => {
+        let notes;
+        getDownloadUrl(imageUri, imageFileName)
+            .then((uploadPercent) => {
+                setIsUploading(true)
+                setUploadProgress(uploadPercent)
+            })
+            .then((url) => {
+                alert(url);
+                notes = new Notes(address, description, url, latitude, longitude);
+                return createNotes(notes)
+            })
+            .catch(error => {
+                let errorMessage = parseFirebaseError(error);
+                setError(errorMessage);
+            })
+            .finally(() => {
+                setIsUploading(false)
+            })
     }
 
     const suggestionView = predictions.map(item =>
@@ -96,11 +120,10 @@ const AddNotes = (props) => {
         />
         {suggestionView}
     </View>;
+    let errorView = error ? <Text style={{ color: colors.textColorError }}>{error}</Text> : null;
 
 
-    var view = null;
-
-    view = <View>
+    var view = <View>
         {!editMode ? searchBarAndSuggestions : null}
         {mapView ?
             <View>
@@ -123,9 +146,6 @@ const AddNotes = (props) => {
                         <Icon name='location' type='evilicon' size={36} color={colors.secondary} iconStyle={{ marginEnd: 16 }} />
                         <Text style={[styles.textSubHeading, { flexShrink: 1 }]}>{address}</Text>
                     </View>
-
-
-
                     <TextInput
                         style={styles.inputBoxFull}
                         multiline={true}
@@ -135,12 +155,17 @@ const AddNotes = (props) => {
                         autoCapitalize='none'
 
                     />
+                    {isUploading ?
 
+                        <View>
+                            <Text>Image Uploading {uploadProgress}% please wait</Text>
+                        </View> : null}
 
                     {
                         imageUri &&
                         <Image source={{ uri: imageUri }} style={{ width: '100%', height: 100, resizeMode: 'contain' }} />
                     }
+                    {errorView}
                     {editMode ?
                         <Fragment>
                             <TouchableOpacity
@@ -152,16 +177,15 @@ const AddNotes = (props) => {
                         </Fragment> :
                         <Fragment>
                             <TouchableOpacity
-                                onPress={this.chooseDocument}
+                                onPress={() => this.chooseDocument()}
                                 style={{ justifyContent: 'flex-start', flexDirection: 'row', alignContent: 'center', margin: 10 }} >
                                 <Text style={{ color: colors.primary, fontSize: 18 }}>Add a photo</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
-                                style={[canAddNotes ? styles.button : styles.buttonDisabled, { alignSelf: 'center' }]}
-                                // onPress={this.handleAddProperty}
-                                disabled={!canAddNotes}
+                                style={[styles.button, { alignSelf: 'center' }]}
+                                onPress={() => this.handleAddNotes()}
                             >
-                                <Text style={canAddNotes ? styles.buttonText : styles.buttonTextDisabled}>Add Notes </Text>
+                                <Text style={styles.buttonText}>Add Notes </Text>
                             </TouchableOpacity>
                         </Fragment>
                     }
@@ -175,11 +199,13 @@ const AddNotes = (props) => {
 
 
 
+
     return (
-        <ScrollView keyboardShouldPersistTaps={'always'} keyboardDismissMode={'on-drag'} >
+        <ScrollView >
             <SafeAreaView>
                 <View style={{ flex: 1 }}>
                     {view}
+
                 </View >
             </SafeAreaView>
         </ScrollView >

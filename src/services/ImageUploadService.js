@@ -10,7 +10,11 @@ export async function getDownloadUrl(uri, fileName) {
     var storageRef = Firebase.storage().ref().child(`${collection}/${fileName}`);
     let task = storageRef.put(blob);
     return new Promise((resolve, reject) => {
-        task.on('state_changed', () => { },
+        task.on('state_changed', (snapshot) => {
+
+            var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+            resolve(progress)
+        },
             (error) => { reject(error) },
             () => {
                 task.snapshot.ref.getDownloadURL()
@@ -33,7 +37,6 @@ export function openDocumentPicker() {
         try {
             const res = DocumentPicker.pick({
                 type: [DocumentPicker.types.images],
-                // DocumentPicker.types.allFiles,image,plainText,audio,pdf
             });
             //uri,type,name(filename),size is in res obj
             resolve(res);
