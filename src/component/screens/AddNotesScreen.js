@@ -1,7 +1,7 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { Image, SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity, View, ActivityIndicator } from 'react-native';
-import { Icon, SearchBar } from 'react-native-elements';
-import { Overlay } from 'react-native-elements';
+import { Icon, SearchBar, Overlay } from 'react-native-elements';
+
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import colors from '../../resources/colors';
 import styles from '../../resources/styles';

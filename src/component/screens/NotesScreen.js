@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { ScrollView, View, FlatList } from 'react-native';
+import { ScrollView, View, FlatList, TouchableOpacity } from 'react-native';
 import { Icon, Card, Text } from 'react-native-elements';
 import { SafeAreaView } from 'react-navigation';
 import AppRoute from '../../resources/appRoute';
@@ -9,7 +9,6 @@ import styles from '../../resources/styles';
 import { getNotes, getNoteById } from '../../services/NoteService';
 import axios from 'axios';
 import { getCurrentUser } from '../../config/Firebase';
-import { TouchableOpacity } from 'react-native-gesture-handler';
 const Notes = (props) => {
 
 
@@ -24,11 +23,13 @@ const Notes = (props) => {
 
 
     useEffect(() => {
+
         getNotes().then((notes) => {
             data = notes.filter((note) => note.userId == currentUser)
             setNotesInState(data)
-        }).catch(error => alert(error));
-    }, [])
+        })
+            .catch(error => alert(error));
+    }, [notes])
 
 
     deleteNotes = (noteId) => {
@@ -41,7 +42,7 @@ const Notes = (props) => {
                     text: 'OK'
                         // onPress: () => deleteNotesWithId(noteId)
                         .catch(error => {
-                            //  errorMessage = parseFirebaseError(error);
+
                             // Alert.alert(errorMessage);
                         })
                 },
@@ -65,6 +66,7 @@ const Notes = (props) => {
                         image={{ uri: item.imageUrl }}>
                         <View style={styles.containerFlexRow}>
                             <Text style={{ flex: 1, fontSize: 16 }}>{item.address}</Text>
+
                             <TouchableOpacity
                                 style={{ marginHorizontal: 4 }}
                                 onPress={() => props.navigation.navigate(AppRoute.AddNotes,
@@ -78,18 +80,12 @@ const Notes = (props) => {
 
                             <TouchableOpacity
                                 style={{ marginHorizontal: 4 }}
-                                disabled={item.leased}>
-                                <Icon name='delete' type='material' size={20} color={item.leased ? colors.darkWhite2 : colors.danger} />
+                                onPress={() => alert("hi")}>
+                                <Icon name='delete' type='material' size={20} color={colors.primary} />
                             </TouchableOpacity>
 
                         </View>
-                        <View style={styles.containerFlexRow}>
-                            <TouchableOpacity
-                                style={{ marginHorizontal: 4 }}
-                                disabled={item.leased}>
-                                <Icon name='delete' type='material' size={20} color={item.leased ? colors.darkWhite2 : colors.danger} />
-                            </TouchableOpacity>
-                        </View>
+
                     </Card>
                 )}
             />

@@ -1,11 +1,13 @@
 import { Container } from 'native-base';
 import React, { useEffect, useState } from 'react';
-import { Image, ProgressBarAndroid, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Image, ProgressBarAndroid, ScrollView, Text, TextInput, TouchableOpacity, View, ActivityIndicator } from 'react-native';
 import { Firebase } from '../../config/Firebase';
+import { Overlay } from 'react-native-elements';
 import AppRoute from '../../resources/appRoute';
 import colors from '../../resources/colors';
 import styles from '../../resources/styles';
 import parseFirebaseError from '../errorParser/firebaseErrorParser';
+
 
 const SignupSteps = {
     SIGNUP: 0,
@@ -60,9 +62,23 @@ const Signup = (props) => {
         setName('');
     }
 
+    var overlayView =
+        <React.Fragment>
+
+            <Overlay
+                isVisible={isLoading}
+                windowBackgroundColor="rgba(255, 255, 255, .5)"
+                overlayBackgroundColor={colors.white}
+                height={200}>
+                <View style={{ height: 100, width: 100 }}>
+                    <ActivityIndicator size="large" style={{ marginTop: 30 }} color="#0000ff" />
+                </View>
+            </Overlay>
+        </React.Fragment>;
+
     let errorView = error ? <Text style={{ color: colors.textColorError }}>{error}</Text> : null;
 
-    let view = isLoading ? <ProgressBarAndroid color={colors.primaryDark} style={{ height: 440 }} /> : step === SignupSteps.SIGNUP ? <React.Fragment>
+    let view = <React.Fragment>
         <TextInput
             style={styles.inputBox}
             value={name}
@@ -89,9 +105,10 @@ const Signup = (props) => {
 
         {errorView}
 
+        {overlayView}
         <TouchableOpacity
             style={canSignUp ? styles.button : styles.buttonDisabled}
-            onPress={this.handleSignUp}
+            onPress={() => handleSignUp()}
             disabled={!canSignUp}
         >
             <Text style={canSignUp ? styles.buttonText : styles.buttonTextDisabled}>SignUp </Text>
@@ -101,24 +118,7 @@ const Signup = (props) => {
         <Text onPress={() => props.navigation.navigate(AppRoute.Login)} style={styles.primaryText}> Login </Text>
             </Text>
         </View>
-    </React.Fragment> :
-        <React.Fragment>
-            <Container style={styles.containerFull}>
-                <Text style={styles.primaryTextHeading}>Account Created</Text>
-                <Text style={{ fontSize: 14, marginTop: 10, marginBottom: 50 }}>Your Account is created please verify your account.</Text>
-
-                <TouchableOpacity
-                    style={{
-                        justifyContent: 'center',
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                    }}
-                    onPress={navigateToLogin}>
-                    <Text style={styles.primaryText}>Go Back to Login</Text>
-                </TouchableOpacity>
-
-            </Container>
-        </React.Fragment>;
+    </React.Fragment>
 
     return (
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}

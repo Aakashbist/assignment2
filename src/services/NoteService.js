@@ -2,17 +2,14 @@ import { Firebase } from '../config/Firebase';
 import { mapToArray } from '../utils/firebaseArray';
 import axios from 'axios';
 
-const noteCollection = 'notes';
-
 const url = "https://us-central1-notes-1e004.cloudfunctions.net"
 
 
-export async function getNotes(userId) {
-    try {
-        const result = await fetch(`${url}/getNotes`);
-        const notes = await result.json();
+export async function getNotes() {
 
-        return notes;
+    try {
+        const result = await axios.get(`${url}/getNotes`);
+        return result.data;
     }
     catch (error) {
     };
@@ -33,9 +30,8 @@ export async function deleteNotesWithId(noteId) {
 
 export async function getNoteById(noteId) {
     try {
-        const result = await fetch(`${url}/getNotesById?id=${noteId}`);
-        const note = await result.json();
-        return note;
+        const result = await axios.get(`${url}/getNotesById?id=${noteId}`);
+        return result.data;
     }
     catch (error) {
     };
