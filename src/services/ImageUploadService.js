@@ -3,18 +3,13 @@ import DocumentPicker from 'react-native-document-picker';
 
 const collection = "Documents"
 export async function getDownloadUrl(uri, fileName) {
-    console.log(uri, fileName, 'download');
     const documentUri = getUriBasedOnOS(uri)
     const response = await fetch(documentUri);
     const blob = await response.blob();
     var storageRef = Firebase.storage().ref().child(`${collection}/${fileName}`);
     let task = storageRef.put(blob);
     return new Promise((resolve, reject) => {
-        task.on('state_changed', (snapshot) => {
-
-            var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-            resolve(progress)
-        },
+        task.on('state_changed', (snapshot) => { },
             (error) => { reject(error) },
             () => {
                 task.snapshot.ref.getDownloadURL()

@@ -15,7 +15,7 @@ export function updateProperty(note, key) {
 }
 
 export function getNotesByUserId(userId) {
-    let dbNoteRef = Firebase.database().ref(`${noteCollection}/${userId}`);
+    let dbNoteRef = Firebase.database().ref(`${noteCollection}/`);
     return new Promise((resolve, reject) => {
         const onResponse = (dataSnapshot) => {
             if (dataSnapshot.exists()) {
@@ -26,7 +26,7 @@ export function getNotesByUserId(userId) {
                 resolve([])
             }
         };
-        dbNoteRef.on('value', onResponse);
+        dbNoteRef.orderByChild(`userId`).equalTo(userId).on('value', onResponse);
     }
     )
 

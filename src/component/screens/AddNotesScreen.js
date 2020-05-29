@@ -1,6 +1,7 @@
 import React, { Fragment, useEffect, useState } from 'react';
-import { Alert, Image, SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Image, SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity, View, ActivityIndicator } from 'react-native';
 import { Icon, SearchBar } from 'react-native-elements';
+import { Overlay } from 'react-native-elements';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import colors from '../../resources/colors';
 import styles from '../../resources/styles';
@@ -10,6 +11,8 @@ import { getGooglePlaceAutocomplete, getGooglePlaceDetails } from '../../service
 import parseFirebaseError from '../errorParser/firebaseErrorParser';
 import parseMapApiError from '../errorParser/mapApiErrorParser';
 import { createNotes } from '../../services/NoteService';
+import AppRoute from '../../resources/appRoute';
+import { getCurrentUser } from '../../config/Firebase';
 
 
 
@@ -26,9 +29,9 @@ const AddNotes = (props) => {
     const [canAddNotes, setCanAddNotes] = useState('');
     const [imageFileName, setImageFileName] = useState();
     const [imageUri, setImageUri] = useState();
-    const [uploadProgress, setUploadProgress] = useState(0);
-    const [isUploading, setIsUploading] = useState(false);
 
+    const [isSaving, setIsSaving] = useState(false);
+    const currentUser = getCurrentUser().uid;
     useEffect(() => {
 
     }, []);
@@ -48,7 +51,7 @@ const AddNotes = (props) => {
                     setPrediction(json.predictions);
                 } else {
                     let errorMessage = parseMapApiError(json);
-                    Alert.alert(errorMessage);
+                    setError(errorMessage);
                 }
             })
             .catch(error => setError(error));
@@ -64,7 +67,7 @@ const AddNotes = (props) => {
                     setMapView(true);
                 } else {
                     let errorMessage = parseMapApiError(json);
-                    Alert.alert(errorMessage);
+                    setError(errorMessage);
                 }
             })
             .catch(error => setError(error));
@@ -72,32 +75,28 @@ const AddNotes = (props) => {
 
     chooseDocument = () => {
         openDocumentPicker().then((response) => {
-            alert(JSON.stringify(response))
             setImageFileName(response.name);
             setImageUri(response.uri)
 
         })
-            .catch(error => (alert(error)))
+            .catch(error => setError(errorMessage))
     }
 
     handleAddNotes = () => {
+        setIsSaving(true)
         let notes;
         getDownloadUrl(imageUri, imageFileName)
-            .then((uploadPercent) => {
-                setIsUploading(true)
-                setUploadProgress(uploadPercent)
-            })
             .then((url) => {
-                alert(url);
-                notes = new Notes(address, description, url, latitude, longitude);
-                return createNotes(notes)
+                notes = new Notes(address, description, url, latitude, longitude, currentUser);
+                createNotes(notes)
             })
             .catch(error => {
                 let errorMessage = parseFirebaseError(error);
                 setError(errorMessage);
             })
             .finally(() => {
-                setIsUploading(false)
+                setIsSaving(false)
+                props.navigation.navigate(AppRoute.NotesList)
             })
     }
 
@@ -105,7 +104,7 @@ const AddNotes = (props) => {
         <TouchableOpacity
             style={styles.suggestion}
             onPress={() => onPredictionSelected(item)}>
-            <Icon name='location' type='evilicon' size={36} color={colors.green} />
+            <Icon name='room' type='material' size={36} color={colors.green} />
             <Text key={item.id} style={{ fontSize: 16 }}> {item.description}</Text>
         </TouchableOpacity >
     );
@@ -121,6 +120,25 @@ const AddNotes = (props) => {
         {suggestionView}
     </View>;
     let errorView = error ? <Text style={{ color: colors.textColorError }}>{error}</Text> : null;
+
+
+
+    var overlayView =
+        <React.Fragment>
+
+            <Overlay
+                isVisible={isSaving}
+
+                windowBackgroundColor="rgba(255, 255, 255, .5)"
+                overlayBackgroundColor={colors.white}
+                height={200}>
+                <View style={{ height: 100, width: 100 }}>
+                    <ActivityIndicator size="large" style={{ marginTop: 30 }} color="#0000ff" />
+                </View>
+            </Overlay>
+        </React.Fragment>;
+
+
 
 
     var view = <View>
@@ -143,7 +161,7 @@ const AddNotes = (props) => {
 
                 <View style={[styles.containerLeft, { paddingHorizontal: 16 }]}>
                     <View style={{ marginVertical: 32, alignSelf: 'stretch', justifyContent: 'space-between', flexDirection: 'row' }}>
-                        <Icon name='location' type='evilicon' size={36} color={colors.secondary} iconStyle={{ marginEnd: 16 }} />
+                        <Icon name='room' type='material' size={36} color={colors.secondary} iconStyle={{ marginEnd: 16 }} />
                         <Text style={[styles.textSubHeading, { flexShrink: 1 }]}>{address}</Text>
                     </View>
                     <TextInput
@@ -155,17 +173,13 @@ const AddNotes = (props) => {
                         autoCapitalize='none'
 
                     />
-                    {isUploading ?
-
-                        <View>
-                            <Text>Image Uploading {uploadProgress}% please wait</Text>
-                        </View> : null}
 
                     {
                         imageUri &&
                         <Image source={{ uri: imageUri }} style={{ width: '100%', height: 100, resizeMode: 'contain' }} />
                     }
                     {errorView}
+                    {overlayView}
                     {editMode ?
                         <Fragment>
                             <TouchableOpacity
@@ -177,13 +191,13 @@ const AddNotes = (props) => {
                         </Fragment> :
                         <Fragment>
                             <TouchableOpacity
-                                onPress={() => this.chooseDocument()}
+                                onPress={() => chooseDocument()}
                                 style={{ justifyContent: 'flex-start', flexDirection: 'row', alignContent: 'center', margin: 10 }} >
                                 <Text style={{ color: colors.primary, fontSize: 18 }}>Add a photo</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
                                 style={[styles.button, { alignSelf: 'center' }]}
-                                onPress={() => this.handleAddNotes()}
+                                onPress={() => handleAddNotes()}
                             >
                                 <Text style={styles.buttonText}>Add Notes </Text>
                             </TouchableOpacity>

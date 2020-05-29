@@ -3,7 +3,7 @@
 #import <React/RCTBridge.h>
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
-
+#import <GoogleMaps/GoogleMaps.h>
 #if DEBUG
 #import <FlipperKit/FlipperClient.h>
 #import <FlipperKitLayoutPlugin/FlipperKitLayoutPlugin.h>
@@ -30,7 +30,7 @@ static void InitializeFlipper(UIApplication *application) {
 #if DEBUG
   InitializeFlipper(application);
 #endif
-
+[GMSServices provideAPIKey:@"AIzaSyC8cfuosSdIXS9JrI5PWrtMYmCVFCGwwnM"];
   RCTBridge *bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:launchOptions];
   RCTRootView *rootView = [[RCTRootView alloc] initWithBridge:bridge
                                                    moduleName:@"Notes"
