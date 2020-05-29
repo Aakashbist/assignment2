@@ -1,63 +1,54 @@
 import { Firebase } from '../config/Firebase';
 import { mapToArray } from '../utils/firebaseArray';
+import axios from 'axios';
 
 const noteCollection = 'notes';
 
+const url = "https://us-central1-notes-1e004.cloudfunctions.net"
 
 
-export function updateProperty(note, key) {
-    return new Promise((resolve, reject) => {
-        let dbNoteRef = Firebase.database().ref().child(`${noteCollection}/${key}`);
-        dbNoteRef.update(note)
-            .then(resolve())
-            .catch(error => reject(error));
-    });
-}
+export async function getNotes(userId) {
+    try {
+        const result = await fetch(`${url}/getNotes`);
+        const notes = await result.json();
 
-export function getNotesByUserId(userId) {
-    let dbNoteRef = Firebase.database().ref(`${noteCollection}/`);
-    return new Promise((resolve, reject) => {
-        const onResponse = (dataSnapshot) => {
-            if (dataSnapshot.exists()) {
-                let data = dataSnapshot.val();
-                let result = mapToArray(data);
-                resolve(result);
-            } else {
-                resolve([])
-            }
-        };
-        dbNoteRef.orderByChild(`userId`).equalTo(userId).on('value', onResponse);
+        return notes;
     }
-    )
+    catch (error) {
+    };
+
 
 }
 
-export function deleteNotesWithId(noteId) {
-    let dbNoteRef = Firebase.database().ref(`${noteCollection}/${noteId}`);
-    return new Promise((resolve, reject) => {
-        return dbNoteRef.remove()
-            .then(resolve())
-            .catch(error => reject(error));
-    });
+export async function deleteNotesWithId(noteId) {
+    try {
+        const res = await axios.delete(`${url}/delete?id=${noteId}`);
+        res.data;
+    }
+    catch (error) {
+        return alert(">>>:  " + error);
+    }
+
 }
 
-export function getPropertyById(noteId) {
-    return new Promise((resolve, reject) => {
-        let dbNoteRef = Firebase.database().ref(`${noteCollection}/${noteId}`);
-        return dbNoteRef.once("value", snapShot => {
-            let data = snapShot.val();
-            resolve(data);
-        }, error => reject(error));
-    })
+export async function getNoteById(noteId) {
+    try {
+        const result = await fetch(`${url}/getNotesById?id=${noteId}`);
+        const note = await result.json();
+        return note;
+    }
+    catch (error) {
+    };
 }
 
-export function createNotes(note) {
-    return new Promise((resolve, reject) => {
-        let dbNoteRef = Firebase.database().ref().child(noteCollection);
-        dbNoteRef.push(note)
-            .then((snapshot) => {
-                resolve(snapshot.key);
-            })
-            .catch(error => reject(error));
-    });
+
+export async function createNotes(note) {
+    try {
+        const res = await axios.post(`${url}/addNotes`, note);
+        res.data
+    }
+    catch (error) {
+        return alert(">>>:  " + error);
+    }
 }
+

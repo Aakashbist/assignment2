@@ -6,7 +6,8 @@ import { SafeAreaView } from 'react-navigation';
 import AppRoute from '../../resources/appRoute';
 import colors from '../../resources/colors';
 import styles from '../../resources/styles';
-import { getNotesByUserId } from '../../services/NoteService';
+import { getNotes, getNoteById } from '../../services/NoteService';
+import axios from 'axios';
 import { getCurrentUser } from '../../config/Firebase';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 const Notes = (props) => {
@@ -20,14 +21,11 @@ const Notes = (props) => {
         setNotes(notesList);
     }
 
-    // getListOfNotes = () => {
-    //     if (currentUser !== null) {
-    //        propertyReference(currentUser, setPropertiesInState)
-    //     }
-    // };
+
 
     useEffect(() => {
-        getNotesByUserId(currentUser).then((data) => {
+        getNotes().then((notes) => {
+            data = notes.filter((note) => note.userId == currentUser)
             setNotesInState(data)
         }).catch(error => alert(error));
     }, [])
@@ -75,12 +73,11 @@ const Notes = (props) => {
                                         mode: 'EDIT'
                                     })}
                             >
-                                <Icon name='create' type='material' onPress={alert("hello")} size={20} color={colors.primaryDark} />
+                                <Icon name='create' type='material' size={20} color={colors.primaryDark} />
                             </TouchableOpacity>
 
                             <TouchableOpacity
                                 style={{ marginHorizontal: 4 }}
-                                onPress={alert("hello")}
                                 disabled={item.leased}>
                                 <Icon name='delete' type='material' size={20} color={item.leased ? colors.darkWhite2 : colors.danger} />
                             </TouchableOpacity>
@@ -89,7 +86,6 @@ const Notes = (props) => {
                         <View style={styles.containerFlexRow}>
                             <TouchableOpacity
                                 style={{ marginHorizontal: 4 }}
-                                onPress={alert("hello")}
                                 disabled={item.leased}>
                                 <Icon name='delete' type='material' size={20} color={item.leased ? colors.darkWhite2 : colors.danger} />
                             </TouchableOpacity>
