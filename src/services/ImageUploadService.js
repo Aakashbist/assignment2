@@ -9,7 +9,7 @@ export async function getDownloadUrl(uri, fileName) {
     var storageRef = Firebase.storage().ref().child(`${collection}/${fileName}`);
     let task = storageRef.put(blob);
     return new Promise((resolve, reject) => {
-        task.on('state_changed', (snapshot) => { },
+        task.on('state_changed', () => { },
             (error) => { reject(error) },
             () => {
                 task.snapshot.ref.getDownloadURL()

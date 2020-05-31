@@ -6,9 +6,11 @@ import { SafeAreaView } from 'react-navigation';
 import AppRoute from '../../resources/appRoute';
 import colors from '../../resources/colors';
 import styles from '../../resources/styles';
-import { getNotes, getNoteById } from '../../services/NoteService';
+import firebase, { Firebase } from '../../config/Firebase'
+import { getNotes, deleteNotesWithId, getNoteById } from '../../services/NoteService';
 import axios from 'axios';
 import { getCurrentUser } from '../../config/Firebase';
+import { Alert } from 'react-native';
 const Notes = (props) => {
 
 
@@ -17,33 +19,33 @@ const Notes = (props) => {
     const currentUser = getCurrentUser().uid;
 
     setNotesInState = (notesList) => {
+        // data = notesList.filter((note) => {
+        //     return note.userId === currentUser
+        // })
         setNotes(notesList);
     }
 
 
 
     useEffect(() => {
-
-        getNotes().then((notes) => {
-            data = notes.filter((note) => note.userId == currentUser)
-            setNotesInState(data)
+        getNotes(currentUser).then((notes) => {
+            setNotesInState(notes)
         })
-            .catch(error => alert(error));
-    }, [notes])
+            .catch(error => alert(">>>here?>?? : " + error));
+    }, [])
 
 
-    deleteNotes = (noteId) => {
+    deleteNote = (noteId) => {
         Alert.alert(
             'Delete Address',
             'Are you sure want to delete this address ?',
             [
                 { text: 'Cancel' },
                 {
-                    text: 'OK'
-                        // onPress: () => deleteNotesWithId(noteId)
+                    text: 'OK',
+                    onPress: () => deleteNotesWithId(noteId)
                         .catch(error => {
-
-                            // Alert.alert(errorMessage);
+                            Alert.alert(error);
                         })
                 },
             ],
@@ -80,7 +82,7 @@ const Notes = (props) => {
 
                             <TouchableOpacity
                                 style={{ marginHorizontal: 4 }}
-                                onPress={() => alert("hi")}>
+                                onPress={() => deleteNote(item.id)}>
                                 <Icon name='delete' type='material' size={20} color={colors.primary} />
                             </TouchableOpacity>
 
@@ -112,12 +114,22 @@ Notes.navigationOptions = (props) => ({
     },
     headerTintColor: colors.white,
     headerRight: () => (
-        <Icon
-            name='add'
-            type='material'
-            size={36}
-            color={colors.white}
-            onPress={() => props.navigation.navigate(AppRoute.AddNotes)} />
+        <View style={styles.containerFlexRow} >
+
+            <Icon
+                name='add'
+                type='material'
+                size={36}
+                color={colors.white}
+                onPress={() => props.navigation.navigate(AppRoute.AddNotes)} />
+            <Icon
+                name='cancel'
+                type='material'
+                size={36}
+                color={colors.white}
+                onPress={() => Firebase.auth().signOut()} />
+        </View>
+
     ),
     headerLeftContainerStyle: {
         marginHorizontal: 16

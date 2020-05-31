@@ -10,7 +10,7 @@ import { getDownloadUrl, openDocumentPicker } from '../../services/ImageUploadSe
 import { getGooglePlaceAutocomplete, getGooglePlaceDetails } from '../../services/mapService';
 import parseFirebaseError from '../errorParser/firebaseErrorParser';
 import parseMapApiError from '../errorParser/mapApiErrorParser';
-import { createNotes } from '../../services/NoteService';
+import { createNotes, getNoteById, updateNote } from '../../services/NoteService';
 import AppRoute from '../../resources/appRoute';
 import { getCurrentUser } from '../../config/Firebase';
 
@@ -29,12 +29,36 @@ const AddNotes = (props) => {
     const [canAddNotes, setCanAddNotes] = useState('');
     const [imageFileName, setImageFileName] = useState();
     const [imageUri, setImageUri] = useState();
-
+    const [noteKey, setNoteKey] = useState();
     const [isSaving, setIsSaving] = useState(false);
-    const currentUser = getCurrentUser().uid;
-    useEffect(() => {
 
+    const currentUser = getCurrentUser().uid;
+
+    useEffect(() => {
+        if (props.navigation.state.params) {
+            const { key, mode } = props.navigation.state.params;
+            getNotes(key, mode);
+        }
     }, []);
+
+    getNotes = (key, mode) => {
+        getNoteById(key).then((data) => {
+            setNoteFields(data, mode, key);
+        }).catch((error) => console.log(error));
+    };
+
+    setNoteFields = (data, mode, key) => {
+        if (mode === "EDIT") {
+            setEditMode(true);
+            setNoteKey(key);
+            setAddress(data.address);
+            setLatitude(data.lat);
+            setLongitude(data.lng);
+            setMapView(true);
+            setImageUri(data.imageUrl);
+            setDescription(data.description);
+        }
+    };
 
     onPredictionSelected = place => {
         setDestination(place.description);
@@ -89,17 +113,32 @@ const AddNotes = (props) => {
             .then((url) => {
                 notes = new Notes(address, description, url, latitude, longitude, currentUser);
                 createNotes(notes)
+                    .then(() => {
+                        setIsSaving(false)
+                        props.navigation.navigate(AppRoute.NotesList)
+                    })
             })
             .catch(error => {
                 let errorMessage = parseFirebaseError(error);
                 setError(errorMessage);
             })
-            .finally(() => {
-                setIsSaving(false)
-                props.navigation.navigate(AppRoute.NotesList)
-            })
     }
 
+    handleUpdateNotes = () => {
+        setIsSaving(true)
+        let notes;
+
+        notes = new Notes(address, description, imageUri, latitude, longitude, currentUser);
+        updateNote(notes, noteKey).then(() => {
+            setIsSaving(false)
+            props.navigation.navigate(AppRoute.NotesList)
+        })
+            .catch(error => {
+                let errorMessage = parseFirebaseError(error);
+                setError(errorMessage);
+            })
+
+    }
     const suggestionView = predictions.map(item =>
         <TouchableOpacity
             style={styles.suggestion}
@@ -184,7 +223,7 @@ const AddNotes = (props) => {
                         <Fragment>
                             <TouchableOpacity
                                 style={[styles.button, { alignSelf: 'center' }]}
-                            // onPress={this.handleUpdateProperty}
+                                onPress={() => handleUpdateNotes()}
                             >
                                 <Text style={styles.buttonText}>Update Notes </Text>
                             </TouchableOpacity>
