@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Image, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Image, ScrollView, Text, TextInput, TouchableOpacity, View, ActivityIndicator } from 'react-native';
 import { Firebase } from '../../config/Firebase';
 import AppRoute from '../../resources/appRoute';
 import colors from '../../resources/colors';
 import styles from '../../resources/styles';
 import parseFirebaseError from '../errorParser/firebaseErrorParser';
+import { Overlay } from 'react-native-elements';
 
 
 const Login = (props) => {
@@ -12,6 +13,7 @@ const Login = (props) => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState();
     const [canLogin, setCanLogin] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         let hasEmailAndPassword = email.trim().length > 0 && password.trim().length > 0;
@@ -21,16 +23,32 @@ const Login = (props) => {
     }, [email, password]);
 
     handleLogin = () => {
+        setIsLoading(true)
         Firebase.auth().signInWithEmailAndPassword(email, password)
-            .then(value => alert(value))
+            .then(user => {
+                setIsLoading(false)
+            })
             .catch((error) => {
+                setIsLoading(false)
                 let errorMessage = parseFirebaseError(error);
                 if (errorMessage) {
                     setError(errorMessage);
                 }
             })
     }
-
+    var overlayView =
+        <React.Fragment>
+            <Overlay
+                isVisible={isLoading}
+                windowBackgroundColor="rgba(255, 255, 255, .5)"
+                overlayBackgroundColor={colors.white}
+                height={200}>
+                <View style={{ height: 100, width: 100 }}>
+                    <ActivityIndicator size="large" style={{ marginTop: 30 }} color="#0000ff" />
+                    <Text style={[styles.textSubHeading, { flexShrink: 1, alignSelf: 'center', marginVertical: 4 }]}>Login</Text>
+                </View>
+            </Overlay>
+        </React.Fragment>;
     let errorView = error ? <Text style={{ color: colors.textColorError }}>{error}</Text> : null;
 
     return (
@@ -55,9 +73,10 @@ const Login = (props) => {
                     secureTextEntry={true}
                 />
                 {errorView}
+                {overlayView}
                 <TouchableOpacity
                     style={canLogin ? styles.button : styles.buttonDisabled}
-                    onPress={this.handleLogin}
+                    onPress={() => handleLogin()}
                     disabled={!canLogin}>
                     <Text style={canLogin ? styles.buttonText : styles.buttonTextDisabled}>Login </Text>
                 </TouchableOpacity>

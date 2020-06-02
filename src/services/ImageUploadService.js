@@ -1,5 +1,6 @@
 import { Firebase } from '../config/Firebase';
 import DocumentPicker from 'react-native-document-picker';
+import ImagePicker from 'react-native-image-picker';
 
 const collection = "Documents"
 export async function getDownloadUrl(uri, fileName) {
@@ -30,21 +31,13 @@ function getUriBasedOnOS(uri) {
 export function openDocumentPicker() {
     return new Promise((resolve, reject) => {
         try {
-            const res = DocumentPicker.pick({
-                type: [DocumentPicker.types.images],
-            });
-            //uri,type,name(filename),size is in res obj
-            resolve(res);
 
+            ImagePicker.showImagePicker({ noData: true, mediaType: 'photo' }, (response) => {
+                resolve(response)
+            });
         } catch (err) {
-            //Handling any exception (If any)
-            if (DocumentPicker.isCancel(err)) {
-                //If user canceled the document selection
-                reject(error)
-            } else {
-                reject(error)
-                throw err;
-            }
+
+            reject(err);
         }
 
     })

@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { ScrollView, View, FlatList, TouchableOpacity } from 'react-native';
-import { Icon, Card, Text } from 'react-native-elements';
+import { Icon, Card, Text, Tooltip } from 'react-native-elements';
 import { SafeAreaView } from 'react-navigation';
 import AppRoute from '../../resources/appRoute';
 import colors from '../../resources/colors';
@@ -13,37 +13,45 @@ import { getCurrentUser } from '../../config/Firebase';
 import { Alert } from 'react-native';
 const Notes = (props) => {
 
-
     const [notes, setNotes] = useState([]);
 
     const currentUser = getCurrentUser().uid;
 
+    //load data initially
+    useEffect(() => {
+        loadNotes(currentUser);
+    }, [])
+
+    //load data when navigating back
+    useEffect(() => {
+        props.navigation.addListener('didFocus', () => {
+            loadNotes(currentUser);
+        })
+    }, [])
+
+    loadNotes = (currentUser) => {
+        getNotes(currentUser).then((notes) => {
+            setNotesInState(notes);
+        })
+            .catch(error => alert(">>>here?>?? : " + error));
+    }
+
     setNotesInState = (notesList) => {
-        // data = notesList.filter((note) => {
-        //     return note.userId === currentUser
-        // })
         setNotes(notesList);
     }
 
 
-
-    useEffect(() => {
-        getNotes(currentUser).then((notes) => {
-            setNotesInState(notes)
-        })
-            .catch(error => alert(">>>here?>?? : " + error));
-    }, [])
-
-
     deleteNote = (noteId) => {
         Alert.alert(
-            'Delete Address',
-            'Are you sure want to delete this address ?',
+            'Delete Note',
+            'Are you sure want to delete this note ?',
             [
                 { text: 'Cancel' },
                 {
                     text: 'OK',
-                    onPress: () => deleteNotesWithId(noteId)
+                    onPress: () => deleteNotesWithId(noteId).then(() => {
+                        loadNotes(currentUser);
+                    })
                         .catch(error => {
                             Alert.alert(error);
                         })
@@ -66,9 +74,10 @@ const Notes = (props) => {
                 renderItem={({ item }) => (
                     <Card
                         image={{ uri: item.imageUrl }}>
-                        <View style={styles.containerFlexRow}>
-                            <Text style={{ flex: 1, fontSize: 16 }}>{item.address}</Text>
 
+                        <Text style={{ fontSize: 16 }}>{item.address}</Text>
+                        <View style={styles.containerFlexRow}>
+                            <Text style={{ flex: 1, fontSize: 16 }}>{item.description}</Text>
                             <TouchableOpacity
                                 style={{ marginHorizontal: 4 }}
                                 onPress={() => props.navigation.navigate(AppRoute.AddNotes,
@@ -122,12 +131,18 @@ Notes.navigationOptions = (props) => ({
                 size={36}
                 color={colors.white}
                 onPress={() => props.navigation.navigate(AppRoute.AddNotes)} />
+
+
             <Icon
-                name='cancel'
+                name='close'
+                tooltip="logout"
                 type='material'
-                size={36}
+                size={30}
                 color={colors.white}
-                onPress={() => Firebase.auth().signOut()} />
+                onPress={() => Firebase.auth().signOut()}
+            />
+
+
         </View>
 
     ),
@@ -136,3 +151,5 @@ Notes.navigationOptions = (props) => ({
     }
 });
 export default Notes
+
+

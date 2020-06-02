@@ -5,7 +5,6 @@ const url = "https://us-central1-notes-1e004.cloudfunctions.net/notes"
 export async function getNotes(userId) {
     try {
         const result = await axios.get(`${url}`);
-
         const allNotes = result.data;
         const notesByCurrentUserId = allNotes.filter(note => { return note.userId === userId });
         return notesByCurrentUserId;
@@ -18,7 +17,7 @@ export async function getNotes(userId) {
 export async function deleteNotesWithId(noteId) {
     try {
         const res = await axios.delete(`${url}/${noteId}`);
-        res.data;
+
     }
     catch (error) {
         return alert(error);
@@ -39,7 +38,8 @@ export async function getNoteById(noteId) {
 
 export async function createNotes(note) {
     try {
-        await axios.post(`${url}/`, note);
+        const notes = await axios.post(`${url}/`, note);
+        return notes.data;
     }
     catch (error) {
         return alert(error);

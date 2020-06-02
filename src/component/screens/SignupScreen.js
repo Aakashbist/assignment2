@@ -42,6 +42,7 @@ const Signup = (props) => {
                 setStep(SignupSteps.SIGNUP_SUCCESS);
             })
             .catch((error) => {
+                setIsLoading(false)
                 let errorMessage = parseFirebaseError(error);
                 if (errorMessage) {
                     setError(errorMessage);
@@ -72,6 +73,7 @@ const Signup = (props) => {
                 height={200}>
                 <View style={{ height: 100, width: 100 }}>
                     <ActivityIndicator size="large" style={{ marginTop: 30 }} color="#0000ff" />
+                    <Text style={[styles.textSubHeading, { flexShrink: 1, alignSelf: 'center', marginVertical: 4 }]}>Saving</Text>
                 </View>
             </Overlay>
         </React.Fragment>;
@@ -105,7 +107,7 @@ const Signup = (props) => {
 
         {errorView}
 
-        {overlayView}
+
         <TouchableOpacity
             style={canSignUp ? styles.button : styles.buttonDisabled}
             onPress={() => handleSignUp()}
@@ -129,6 +131,7 @@ const Signup = (props) => {
                     style={{ width: 200, height: 200, marginBottom: 30 }}
                 />
                 {view}
+                {overlayView}
             </View>
         </ScrollView>
     )
