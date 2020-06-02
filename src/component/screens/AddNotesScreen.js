@@ -178,7 +178,7 @@ const AddNotes = (props) => {
         <React.Fragment>
 
             <Overlay
-                isVisible={isLoading}
+                isVisible={isSaving}
                 windowBackgroundColor="rgba(255, 255, 255, .5)"
                 overlayBackgroundColor={colors.white}
                 height={200}>
