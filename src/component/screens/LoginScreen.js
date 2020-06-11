@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Image, ScrollView, Text, TextInput, TouchableOpacity, View, ActivityIndicator } from 'react-native';
-import { Firebase } from '../../config/Firebase';
+import { Firebase, getCurrentUser } from '../../config/Firebase';
 import AppRoute from '../../resources/appRoute';
 import colors from '../../resources/colors';
 import styles from '../../resources/styles';
 import parseFirebaseError from '../errorParser/firebaseErrorParser';
 import { Overlay } from 'react-native-elements';
+import axios from 'axios';
+import { User } from '../../models/User';
 
 
 const Login = (props) => {
@@ -22,10 +24,21 @@ const Login = (props) => {
         }
     }, [email, password]);
 
-    handleLogin = () => {
+    handleLogin = async () => {
+        // const user = new User(email, password)
+        // const notes = await axios.post('http://localhost:3000/api/user/login', {
+        //     email: email,
+        //     password: password
+        // });
+        // alert(JSON.stringify(notes));
         setIsLoading(true)
         Firebase.auth().signInWithEmailAndPassword(email, password)
-            .then(user => {
+            .then(() => {
+                const user = getCurrentUser();
+                AsyncStorage.setItem("userId", user.uid);
+                AsyncStorage.setItem("userEmail", user.email);
+
+                alert(userId)
                 setIsLoading(false)
             })
             .catch((error) => {

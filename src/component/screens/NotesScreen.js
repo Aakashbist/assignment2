@@ -8,7 +8,6 @@ import colors from '../../resources/colors';
 import styles from '../../resources/styles';
 import firebase, { Firebase } from '../../config/Firebase'
 import { getNotes, deleteNotesWithId, getNoteById } from '../../services/NoteService';
-import axios from 'axios';
 import { getCurrentUser } from '../../config/Firebase';
 import { Alert } from 'react-native';
 const Notes = (props) => {

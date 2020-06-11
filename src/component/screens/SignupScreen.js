@@ -7,7 +7,9 @@ import AppRoute from '../../resources/appRoute';
 import colors from '../../resources/colors';
 import styles from '../../resources/styles';
 import parseFirebaseError from '../errorParser/firebaseErrorParser';
-
+import AsyncStorage from '@react-native-community/async-storage';
+import axios from 'axios';
+import { User } from '../../models/User';
 
 const SignupSteps = {
     SIGNUP: 0,
@@ -34,21 +36,37 @@ const Signup = (props) => {
         }
     }, [name, email, password, isLoading]);
 
+
     handleSignUp = () => {
-        setIsLoading(true);
-        Firebase.auth().createUserWithEmailAndPassword(email, password)
-            .then((userInfo) => {
-                clearFields();
-                setStep(SignupSteps.SIGNUP_SUCCESS);
-            })
-            .catch((error) => {
-                setIsLoading(false)
-                let errorMessage = parseFirebaseError(error);
-                if (errorMessage) {
-                    setError(errorMessage);
-                }
-            })
-            .finally(() => setIsLoading(false));
+        const user = new User(email, password, name)
+        //try {
+        //
+        //     const notes = await axios.post('http://localhost:3000/api/user/register', user);
+        //     alert(JSON.stringify(notes));
+        // } catch (error) {
+        //     alert(JSON.stringify(error.response.data))
+        // }
+        return axios.post('http://localhost:3000/api/user/register', user).then(notes => {
+            alert(JSON.stringify(notes));
+        }).catch((error) => {
+            alert(JSON.stringify(error.response.data.message))
+        });
+
+
+        // setIsLoading(true);
+        // Firebase.auth().createUserWithEmailAndPassword(email, password)
+        //     .then(() => {
+        //         clearFields();
+        //         setStep(SignupSteps.SIGNUP_SUCCESS);
+        //     })
+        //     .catch((error) => {
+        //         setIsLoading(false)
+        //         let errorMessage = parseFirebaseError(error);
+        //         if (errorMessage) {
+        //             setError(errorMessage);
+        //         }
+        //     })
+        //     .finally(() => setIsLoading(false));
     }
 
     navigateToLogin = () => {

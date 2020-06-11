@@ -226,11 +226,7 @@ const AddNotes = (props) => {
                         imageUri &&
                         <Image source={{ uri: imageUri }} style={{ width: '100%', height: 100, resizeMode: 'contain' }} />
                     }
-                    <TouchableOpacity
-                        onPress={() => chooseDocument()}
-                        style={{ justifyContent: 'flex-start', flexDirection: 'row', alignContent: 'center', margin: 10 }} >
-                        <Text style={{ color: colors.primary, fontSize: 18 }}>Add a photo</Text>
-                    </TouchableOpacity>
+
 
                     {editMode ?
                         <Fragment>
@@ -243,7 +239,11 @@ const AddNotes = (props) => {
                             </TouchableOpacity>
                         </Fragment> :
                         <Fragment>
-
+                            <TouchableOpacity
+                                onPress={() => chooseDocument()}
+                                style={{ justifyContent: 'flex-start', flexDirection: 'row', alignContent: 'center', margin: 10 }} >
+                                <Text style={{ color: colors.primary, fontSize: 18 }}>Add a photo</Text>
+                            </TouchableOpacity>
                             <TouchableOpacity
                                 style={[canAddNotes ? styles.button : styles.buttonDisabled, { alignSelf: 'center' }]}
                                 disabled={!canAddNotes}

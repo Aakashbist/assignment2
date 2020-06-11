@@ -1,5 +1,4 @@
 import { Firebase } from '../config/Firebase';
-import DocumentPicker from 'react-native-document-picker';
 import ImagePicker from 'react-native-image-picker';
 
 const collection = "Documents"
@@ -8,6 +7,7 @@ export async function getDownloadUrl(uri, fileName) {
     const response = await fetch(documentUri);
     const blob = await response.blob();
     var storageRef = Firebase.storage().ref().child(`${collection}/${fileName}`);
+
     let task = storageRef.put(blob);
     return new Promise((resolve, reject) => {
         task.on('state_changed', () => { },
