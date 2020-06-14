@@ -8,6 +8,7 @@ export async function getGooglePlaceAutocomplete(destination) {
         return json;
     }
     catch (error) {
+        return error;
     };
 }
 
@@ -19,5 +20,6 @@ export async function getGooglePlaceDetails(address) {
         return json;
     }
     catch (error) {
+        return error;
     };
 }

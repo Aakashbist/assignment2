@@ -25,12 +25,6 @@ const Login = (props) => {
     }, [email, password]);
 
     handleLogin = async () => {
-        // const user = new User(email, password)
-        // const notes = await axios.post('http://localhost:3000/api/user/login', {
-        //     email: email,
-        //     password: password
-        // });
-        // alert(JSON.stringify(notes));
         setIsLoading(true)
         Firebase.auth().signInWithEmailAndPassword(email, password)
             .then(() => {

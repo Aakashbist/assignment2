@@ -10,7 +10,7 @@ export async function getNotes(userId) {
         return notesByCurrentUserId;
     }
     catch (error) {
-        return alert(error);
+        return error;
     };
 }
 
@@ -20,7 +20,7 @@ export async function deleteNotesWithId(noteId) {
 
     }
     catch (error) {
-        return alert(error);
+        return error;
     }
 
 }
@@ -31,7 +31,7 @@ export async function getNoteById(noteId) {
         return result.data;
     }
     catch (error) {
-        return alert(error);
+        return error;
     };
 }
 
@@ -42,7 +42,7 @@ export async function createNotes(note) {
         return notes.data;
     }
     catch (error) {
-        return alert(error);
+        return error;
     }
 }
 
@@ -50,6 +50,6 @@ export async function updateNote(note, noteId) {
     try {
         await axios.put(`${url}/${noteId}`, note);
     } catch (error) {
-        return alert(error);
+        return error;
     }
 }
