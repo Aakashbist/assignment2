@@ -41,8 +41,9 @@ const Signup = (props) => {
         setIsLoading(true);
         Firebase.auth().createUserWithEmailAndPassword(email, password)
             .then(() => {
+                setIsLoading(false);
                 clearFields();
-                setStep(SignupSteps.SIGNUP_SUCCESS);
+                navigateToLogin();
             })
             .catch((error) => {
                 setIsLoading(false)
